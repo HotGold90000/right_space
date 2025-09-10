@@ -2,7 +2,7 @@ name: Update JSON Demo
 
 on:
   repository_dispatch:
-    types: [update_json]  # 用于 Android / curl 触发
+    types: [update_json]  # 通过 curl 触发
 
 jobs:
   update-json:
@@ -12,17 +12,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Update JSON
         run: |
-          # 追加新数据
           TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
           NEW_ENTRY="{\"id\":$(($(jq '. | length' data.json)+1)), \"message\":\"Hello at $TIMESTAMP\"}"
           jq ". += [$NEW_ENTRY]" data.json > tmp.json && mv tmp.json data.json
 
       - name: Commit and push changes
         run: |
-          git config --local user.email "liumiao36@xdf.cn"
-          git config --local user.name "liumiao36"
+          git config --local user.email "bot@example.com"
+          git config --local user.name "github-actions-bot"
           git add data.json
-          git commit -m "Add new entry via Action"
+          git commit -m "Add new entry via Action" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
