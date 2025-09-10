@@ -23,8 +23,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --local user.email "bot@example.com"
-          git config --local user.name "github-actions-bot"
+          git config --local user.email "liumiao36@xdf.cn"
+          git config --local user.name "liumiao36"
           git add data.json
           git commit -m "Add new entry via Action" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
