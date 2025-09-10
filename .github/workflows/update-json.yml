@@ -1,0 +1,30 @@
+name: Update JSON Demo
+
+on:
+  repository_dispatch:
+    types: [update_json]  # 用于 Android / curl 触发
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update JSON
+        run: |
+          # 追加新数据
+          TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+          NEW_ENTRY="{\"id\":$(($(jq '. | length' data.json)+1)), \"message\":\"Hello at $TIMESTAMP\"}"
+          jq ". += [$NEW_ENTRY]" data.json > tmp.json && mv tmp.json data.json
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.json
+          git commit -m "Add new entry via Action"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
