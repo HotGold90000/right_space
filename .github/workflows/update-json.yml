@@ -2,15 +2,17 @@ name: Update JSON Demo
 
 on:
   repository_dispatch:
-    types: [update_json]  # 通过 curl 触发
+    types: [update_json]
 
 jobs:
   update-json:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with PAT
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -27,4 +29,5 @@ jobs:
           git config --local user.name "liumiao36"
           git add data.json
           git commit -m "Add new entry via Action" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin HEAD:main
