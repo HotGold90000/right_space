@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
     val time = now.format(DateTimeFormatter.ofPattern("HH:mm"))
 
     // 从环境变量中读取写入内容（来自 GitHub Actions payload）
-    val content = System.getenv("CONTENT") ?: "默认内容"
+    val content = System.getenv("CONTENT") ?: ""
 
     // 月份文件路径
     val file = File("dataSource/$yearMonth.json")
