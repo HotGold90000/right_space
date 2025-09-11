@@ -8,25 +8,28 @@ jobs:
   update-json:
     runs-on: ubuntu-latest
     env:
-      TZ: Asia/Shanghai   # 全局设置为北京时间
+      TZ: Asia/Shanghai   # 全局北京时间
 
     steps:
-      - name: Checkout repository with PAT
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Setup Kotlin
-        uses: fwilhe2/setup-kotlin@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
 
-      - name: Run Kotlin script to update JSON
-        run: kotlinc -script update-json.kts
+      - name: Run Gradle UpdateJson task
+        run: ./gradlew updateJson
 
       - name: Commit and push changes
         run: |
           git config --local user.email "liumiao36@xdf.cn"
           git config --local user.name "liumiao36"
           git add data.json
-          git commit -m "Add new entry via Kotlin script" || echo "No changes to commit"
+          git commit -m "Add new entry via Kotlin program" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin HEAD:main
