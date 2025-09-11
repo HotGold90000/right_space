@@ -18,10 +18,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+
       - name: Run Kotlin script to update JSON
-        run: |
-          kotlinc UpdateJson.kt -cp gson-2.10.1.jar -include-runtime -d UpdateJson.jar
-          java -cp UpdateJson.jar:gson-2.10.1.jar UpdateJsonKt
+        run: ./gradlew updateJson
         env:
           CONTENT: ${{ github.event.client_payload.content }}
 
@@ -33,6 +34,7 @@ jobs:
           git commit -m "Update monthly data via Kotlin program" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin HEAD:main
+
 
 
 
