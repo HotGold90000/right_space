@@ -8,7 +8,7 @@ jobs:
   update-json:
     runs-on: ubuntu-latest
     env:
-      TZ: Asia/Shanghai   # 设置为北京时间
+      TZ: Asia/Shanghai   # 全局设置为北京时间
 
     steps:
       - name: Checkout repository with PAT
@@ -16,20 +16,17 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
+      - name: Setup Kotlin
+        uses: fwilhe2/setup-kotlin@v1
 
-      - name: Update JSON
-        run: |
-          TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-          NEW_ENTRY="{\"id\":$(($(jq '. | length' data.json)+1)), \"message\":\"Hello at $TIMESTAMP\"}"
-          jq ". += [$NEW_ENTRY]" data.json > tmp.json && mv tmp.json data.json
+      - name: Run Kotlin script to update JSON
+        run: kotlinc -script update-json.kts
 
       - name: Commit and push changes
         run: |
           git config --local user.email "liumiao36@xdf.cn"
           git config --local user.name "liumiao36"
           git add data.json
-          git commit -m "Add new entry via Action" || echo "No changes to commit"
+          git commit -m "Add new entry via Kotlin script" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin HEAD:main
